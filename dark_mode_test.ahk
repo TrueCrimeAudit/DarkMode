@@ -204,12 +204,3 @@ MyGui.Add("Radio", "x120 y" . (CurrentY + 250) . " vMyRadio", "Sample Radio")
 MyGui.Show("w" . WindowWidth . " h" . (CurrentY + 300)) ; Adjust height as needed
 
 return
-
-MyGuiClose(GuiObj) {
-    global g_arrBrushes
-    for brush in g_arrBrushes {
-        if brush DllCall("gdi32\DeleteObject", "ptr", brush)
-    }
-    g_arrBrushes := []
-    ExitApp
-}
