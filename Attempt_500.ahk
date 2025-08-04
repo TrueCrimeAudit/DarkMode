@@ -1,4 +1,4 @@
-#Requires AutoHotkey v2.1-alpha.16
+﻿#Requires AutoHotkey v2.1-alpha.16
 #SingleInstance Force
 
 EnhancedDarkApp()
@@ -34,22 +34,22 @@ class EnhancedDarkApp {
         this.darkMonthCal := this.darkMode.AddDarkMonthCal("y+15 x15")
         this.darkTabs := this.darkMode.AddDarkTab3("y+15 x15 w300 h150", ["Tab 1", "Tab 2", "Tab 3"])
 
-        this.gui.Tab := 1
+        this.darkTabs.UseTab(1)
         this.darkMode.AddDarkText("y+10 x25 w280", "Content for Tab 1")
         this.darkMode.AddDarkEdit("y+10 x25 w280 h80", "Tab 1 content area")
 
-        this.gui.Tab := 2
+        this.darkTabs.UseTab(2)
         this.darkMode.AddDarkText("y+10 x25 w280", "Content for Tab 2")
         this.darkMode.AddDarkButton("y+10 x25 w100", "Tab 2 Button")
 
-        this.gui.Tab := 3
+        this.darkTabs.UseTab(3)
         this.darkMode.AddDarkText("y+10 x25 w280", "Content for Tab 3")
         this.darkMode.AddDarkListBox("y+10 x25 w200 h80", ["List Item 1", "List Item 2", "List Item 3"])
 
-        this.gui.Tab := ""
+        this.darkTabs.UseTab("")
 
         this.darkMode.AddDarkText("y+20 x15 w300", "Theme Settings")
-        this.themeSelecter := this.darkMode.AddDarkComboBox("y+10 x15 w200", ["Dark Blue", "Dark Gray", "Dark Green", "Dark Purple"])
+        this.themeSelecter := this.darkMode.AddDarkComboBox("y+10 x15 w200 vthemecombo", ["Dark Blue", "Dark Gray", "Dark Green", "Dark Purple"])
             .OnEvent("Change", this.ThemeChanged.Bind(this))
 
         this.actionButton.OnEvent("Click", this.ButtonClicked.Bind(this))
@@ -64,8 +64,9 @@ class EnhancedDarkApp {
         this.darkProgress.Value := this.darkSlider.Value
     }
 
-    ThemeChanged(*) {
-        themeIndex := this.themeSelecter.Value
+    ThemeChanged(GuiCtrlObj, *) {
+        themebox := GuiCtrlObj.gui["themecombo"]
+        themeIndex := themebox.Text
         themes := Map(
             "Dark Blue", Map("Background", 0x1A1A2E, "Controls", 0x16213E, "Font", 0xE0E0E0),
             "Dark Gray", Map("Background", 0x171717, "Controls", 0x1E1E1E, "Font", 0xE0E0E0),
