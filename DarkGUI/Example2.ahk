@@ -13,7 +13,7 @@ class NMCUSTOMDRAWINFO
             buf := Buffer(16)
             NumPut("int", left, "int", top, "int", right, "int", bottom, buf)
             for k, v in ofst
-                buf.DefineProp(k, {Get: NumGet.Bind(, v, "int"), Set: IntPut.Bind(v)})
+                buf.DefineProp(k, { Get: NumGet.Bind(, v, "int"), Set: IntPut.Bind(v) })
             return buf
             IntPut(ofst, _, v) => NumPut("int", v, _, ofst)
         }
@@ -59,14 +59,14 @@ class BtnUtils
 {
     static SetBackColor(myBtn, btnBgColor, colorBehindBtn?, roundedCorner?)
     {
-        static BS_FLAT          := 0x8000
-        static BS_BITMAP        := 0x0080
-        static IS_WIN11         := (VerCompare(A_OSVersion, "10.0.22200") >= 0)
-        static WM_CTLCOLORBTN   := 0x0135
-        static NM_CUSTOMDRAW    := -12
-        static WM_DESTROY       := 0x0002
+        static BS_FLAT := 0x8000
+        static BS_BITMAP := 0x0080
+        static IS_WIN11 := (VerCompare(A_OSVersion, "10.0.22200") >= 0)
+        static WM_CTLCOLORBTN := 0x0135
+        static NM_CUSTOMDRAW := -12
+        static WM_DESTROY := 0x0002
         static WS_EX_COMPOSITED := 0x02000000
-        static WS_CLIPSIBLINGS  := 0x04000000
+        static WS_CLIPSIBLINGS := 0x04000000
 
         rcRgn := ""
         clr := IsNumber(btnBgColor) ? btnBgColor : BtnUtils.ColorHex(btnBgColor)
@@ -98,31 +98,31 @@ class BtnUtils
                 BtnUtils.SetBkColor(wParam, btnBkColr)
             }
 
-            return hbrush 
+            return hbrush
         }
 
         ON_NM_CUSTOMDRAW(gCtrl, lParam)
         {
-            static CDDS_PREPAINT        := 0x1
-            static CDDS_PREERASE        := 0x3
-            static CDIS_HOT             := 0x40
+            static CDDS_PREPAINT := 0x1
+            static CDDS_PREERASE := 0x3
+            static CDIS_HOT := 0x40
             static CDRF_NOTIFYPOSTPAINT := 0x10
-            static CDRF_SKIPPOSTPAINT   := 0x100
-            static CDRF_SKIPDEFAULT     := 0x4
+            static CDRF_SKIPPOSTPAINT := 0x100
+            static CDRF_SKIPDEFAULT := 0x4
             static CDRF_NOTIFYPOSTERASE := 0x40
-            static CDRF_DODEFAULT       := 0x0
-            static DC_BRUSH             := BtnUtils.GetStockObject(18)
-            static DC_PEN               := BtnUtils.GetStockObject(19)
-            
+            static CDRF_DODEFAULT := 0x0
+            static DC_BRUSH := BtnUtils.GetStockObject(18)
+            static DC_PEN := BtnUtils.GetStockObject(19)
+
             Critical(-1)
 
             lpnmCD := StructFromPtr(NMCUSTOMDRAWINFO, lParam)
 
             if (lpnmCD["hdr"]["code"] != NM_CUSTOMDRAW || lpnmCD["hdr"]["hwndFrom"] != gCtrl.hwnd)
                 return
-            
+
             switch lpnmCD["dwDrawStage"] {
-            case CDDS_PREERASE:
+                case CDDS_PREERASE:
                 {
                     if (roundedCorner ?? IS_WIN11) {
                         rcRgn := BtnUtils.CreateRoundRectRgn(lpnmCD["rc"].left, lpnmCD["rc"].top, lpnmCD["rc"].right, lpnmCD["rc"].bottom, roundedCorner ?? 9, roundedCorner ?? 9)
@@ -130,34 +130,34 @@ class BtnUtils
                     }
 
                     BtnUtils.SetBkMode(lpnmCD["hdc"], 0)
-                    return CDRF_NOTIFYPOSTERASE 
+                    return CDRF_NOTIFYPOSTERASE
                 }
-            case CDDS_PREPAINT: 
-                {
-                    brushColor := (!(lpnmCD["uItemState"] & CDIS_HOT) ? clr : (GetKeyState("LButton", "P")) ? pushedColor : hoverColor)
+                    case CDDS_PREPAINT:
+                    {
+                        brushColor := (!(lpnmCD["uItemState"] & CDIS_HOT) ? clr : (GetKeyState("LButton", "P")) ? pushedColor : hoverColor)
 
-                    BtnUtils.SelectObject(lpnmCD["hdc"], DC_BRUSH)
-                    BtnUtils.SetDCBrushColor(lpnmCD["hdc"], brushColor)
-                    
-                    BtnUtils.SelectObject(lpnmCD["hdc"], DC_PEN)
-                    BtnUtils.SetDCPenColor(lpnmCD["hdc"], gCtrl.Focused ? 0x1C1C1C : brushColor)
+                        BtnUtils.SelectObject(lpnmCD["hdc"], DC_BRUSH)
+                        BtnUtils.SetDCBrushColor(lpnmCD["hdc"], brushColor)
 
-                    if gCtrl.Focused 
-                        BtnUtils.DrawFocusRect(lpnmCD["hdc"], lpnmCD["rc"])
+                        BtnUtils.SelectObject(lpnmCD["hdc"], DC_PEN)
+                        BtnUtils.SetDCPenColor(lpnmCD["hdc"], gCtrl.Focused ? 0x1C1C1C : brushColor)
 
-                    rounded := !!(rcRgn ?? 0)
+                        if gCtrl.Focused
+                            BtnUtils.DrawFocusRect(lpnmCD["hdc"], lpnmCD["rc"])
 
-                    BtnUtils.RoundRect(lpnmCD["hdc"], lpnmCD["rc"].left, lpnmCD["rc"].top, lpnmCD["rc"].right - rounded, lpnmCD["rc"].bottom - rounded, roundedCorner ?? 9, roundedCorner ?? 9)
+                        rounded := !!(rcRgn ?? 0)
 
-                    if rounded {
-                        BtnUtils.DeleteObject(rcRgn)
-                        rcRgn := ""
+                        BtnUtils.RoundRect(lpnmCD["hdc"], lpnmCD["rc"].left, lpnmCD["rc"].top, lpnmCD["rc"].right - rounded, lpnmCD["rc"].bottom - rounded, roundedCorner ?? 9, roundedCorner ?? 9)
+
+                        if rounded {
+                            BtnUtils.DeleteObject(rcRgn)
+                            rcRgn := ""
+                        }
+
+                        return CDRF_NOTIFYPOSTPAINT
                     }
-
-                    return CDRF_NOTIFYPOSTPAINT 
-                }
             }
-            
+
             return CDRF_DODEFAULT
         }
     }
@@ -184,25 +184,25 @@ class BtnUtils
 
     static FillRect(hDC, lprc, hbr) => DllCall("User32\FillRect", "ptr", hDC, "ptr", lprc, "ptr", hbr, "int")
 
-    static IsColorDark(clr) => 
-        ( (clr >> 16 & 0xFF) / 255 * 0.2126 
-        + (clr >>  8 & 0xFF) / 255 * 0.7152 
-        + (clr       & 0xFF) / 255 * 0.0722 < 0.5 )
+    static IsColorDark(clr) =>
+        ((clr >> 16 & 0xFF) / 255 * 0.2126
+            + (clr >> 8 & 0xFF) / 255 * 0.7152
+            + (clr & 0xFF) / 255 * 0.0722 < 0.5)
 
     static RGB(R := 255, G := 255, B := 255) => ((R << 16) | (G << 8) | B)
-    
+
     static BrightenColor(clr, perc := 5) => ((p := perc / 100 + 1), BtnUtils.RGB(Round(Min(255, (clr >> 16 & 0xFF) * p)), Round(Min(255, (clr >> 8 & 0xFF) * p)), Round(Min(255, (clr & 0xFF) * p))))
 
     static RoundRect(hdc, nLeftRect, nTopRect, nRightRect, nBottomRect, nWidth, nHeight) => DllCall('Gdi32\RoundRect', 'ptr', hdc, 'int', nLeftRect, 'int', nTopRect, 'int', nRightRect, 'int', nBottomRect, 'int', nWidth, 'int', nHeight, 'int')
-    
+
     static SetTextColor(hdc, color) => DllCall("SetTextColor", "Ptr", hdc, "UInt", color)
-    
+
     static SetWindowTheme(hwnd, appName, subIdList?) => DllCall("uxtheme\SetWindowTheme", "ptr", hwnd, "ptr", StrPtr(appName), "ptr", subIdList ?? 0)
-    
+
     static SelectObject(hdc, hgdiobj) => DllCall('Gdi32\SelectObject', 'ptr', hdc, 'ptr', hgdiobj, 'ptr')
-            
+
     static SetBkColor(hdc, crColor) => DllCall('Gdi32\SetBkColor', 'ptr', hdc, 'uint', crColor, 'uint')
-    
+
     static SetBkMode(hdc, iBkMode) => DllCall('Gdi32\SetBkMode', 'ptr', hdc, 'int', iBkMode, 'int')
 }
 
@@ -324,7 +324,7 @@ stahirovka(GuiObject?, eventInfo?) {
     Return
 }
 
-lecua(GuiObject?, eventInfo?){
+lecua(GuiObject?, eventInfo?) {
     hide_ui()
     ErrorLevel := SendMessage(0x50, , 0x4190419, , "A")
     SendInput("{t}")
@@ -361,7 +361,7 @@ DirCreate(A_Temp . "\ahk-news")
 cfg_file := A_Temp . "\ahk-news\config.cfg"
 temp_file := A_Temp . "\ahk-news\tempp.cfg"
 
-if !FileExist(temp_file){
+if !FileExist(temp_file) {
     try {
         FileAppend("", temp_file, "utf-8")
     } catch Error as err {
@@ -372,7 +372,7 @@ if !FileExist(temp_file){
 temp_data := ""
 cfg_data := ""
 
-if FileExist(temp_file){
+if FileExist(temp_file) {
     try {
         temp_data := FileRead(temp_file)
     } catch Error as err {
@@ -380,7 +380,7 @@ if FileExist(temp_file){
     }
 }
 
-if FileExist(cfg_file){
+if FileExist(cfg_file) {
     try {
         cfg_data := FileRead(cfg_file)
     } catch Error as err {
@@ -389,7 +389,7 @@ if FileExist(cfg_file){
 }
 
 restart_ui(GuiObject?, eventInfo?)
-{   
+{
     try {
         FileAppend("restart", temp_file, "utf-8")
         Reload()
@@ -399,15 +399,15 @@ restart_ui(GuiObject?, eventInfo?)
 }
 
 open_rp_termin(GuiObject?, eventInfo?)
-{   
+{
     Main.Hide()
     rp_termin.Show("AutoSize")
 }
 
 hide_ui()
-{   
+{
     If WinExist("AHK | RP Термины") or WinExist("AHK | Основное")
-    {    
+    {
         Main.Hide()
         rp_termin.Hide()
         Sleep(100)
@@ -454,7 +454,7 @@ sta.OnEvent("Click", stahirovka)
 
 lec := Main.AddButton("w200 h20", "Лекция")
 BtnUtils.SetBackColor(lec, 0x4e4e4e, 0x1C1C1C)
-lec.OnEvent("Click", lecua) 
+lec.OnEvent("Click", lecua)
 
 rpt := Main.AddButton("w200 h20", 'РП ТЕРМИНЫ')
 BtnUtils.SetBackColor(rpt, 0x4e4e4e, 0x1C1C1C)
@@ -465,7 +465,7 @@ rp_termin.Opt("+AlwaysOnTop")
 rp_termin.Title := "AHK | RP Термины"
 rp_termin.BackColor := 0x1C1C1C
 
-rp_termin.AddText("cWhite","
+rp_termin.AddText("cWhite", "
 (Ltrim join`r`n
 OOC  ( НонРП чат ) - это все, что касается реального 
 мира. (пишется /n текст)
@@ -535,17 +535,17 @@ close_notify(GuiObject?, eventInfo?)
 notify := Gui()
 notify.Opt("+AlwaysOnTop")
 notify.Title := "AHK | Статус"
-notify.BackColor := 0x1C1C1C 
+notify.BackColor := 0x1C1C1C
 
 if temp_data == "restart" {
-    notify.AddText("cWhite","AHK | СМИ | Программа была перезапущена")
+    notify.AddText("cWhite", "AHK | СМИ | Программа была перезапущена")
 }
 else {
-    notify.AddText("cWhite","AHK | СМИ | Программа запущена и свёрнута в трей")
+    notify.AddText("cWhite", "AHK | СМИ | Программа запущена и свёрнута в трей")
 }
 
-if !FileExist(cfg_file){
-    notify.AddText("cWhite","
+if !FileExist(cfg_file) {
+    notify.AddText("cWhite", "
     (Ltrim join`r`n
 AHK | СМИ | Список изменений:
 made with love by Agzes! [WertyKnack]
@@ -569,13 +569,13 @@ try {
 }
 
 ; Hotkey definitions
-Numpad0::Reload()
-Numpad1::Main.Show("AutoSize")
-Numpad2::greetings()
-Numpad4::back()
-Numpad3::ad_edit()
-!q::greetings()
-!b::back()
-!e::ad_edit()
-F10::Reload()
-F4::Main.Show("AutoSize")
+Numpad0:: Reload()
+Numpad1:: Main.Show("AutoSize")
+Numpad2:: greetings()
+Numpad4:: back()
+Numpad3:: ad_edit()
+!q:: greetings()
+!b:: back()
+!e:: ad_edit()
+F10:: Reload()
+F4:: Main.Show("AutoSize")

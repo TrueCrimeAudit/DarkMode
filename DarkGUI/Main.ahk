@@ -12,11 +12,11 @@
 
 R_G_Binds := ""
 
-Esc::ExitApp
+Esc:: ExitApp
 
 global logs := []
 LogAdd(Text) {
-	logs.Push(Text)
+    logs.Push(Text)
 }
 
 Username := "User"
@@ -27,56 +27,56 @@ global settings := SettingsManager()
 
 global Settings := settings.Settings
 
-; Add this at the start of your script 
+; Add this at the start of your script
 global G_Binds_Name := [
     "Menu", "Bind", "Options", "Information", "Reload",
-    "Welcome", "Pass tablet", "Sell honey", "Bruise", "Ammonia", 
+    "Welcome", "Pass tablet", "Sell honey", "Bruise", "Ammonia",
     "Injection", "Med. Card", "Extract from ward 6", "Med. Exam", "Professional suitability",
     "Knife/Bullet", "Stretcher/Dropper", "Defibrillator", "Twist + soothing injection", "Calming injection",
-    "Plastic surgery", "Blood test", "Treat wound", "Bullet removal", "Closed fracture", 
+    "Plastic surgery", "Blood test", "Treat wound", "Bullet removal", "Closed fracture",
     "Open fracture", "X-ray", "Dislocation", "CPR", "ECG",
     "Lecture", "Charter 1", "Charter 3", "Charter 3 terms", "Charter 4",
     "Oath 1", "Oath 2", "Orders", "Practice 1", "Practice 2",
     "PMP Dislocation", "PMP Closed", "PMP Open", "PMP Bullet", "PMP Knife"
- ]
+]
 
 SaveSettingsForUSERDATA(Element, *) {
-	try {
-		settings.Settings["Name"] := SSP_P1_NAME.Text
-		settings.Settings["Role"] := SSP_P1_ROLE.Text
-		settings.Settings["UserName"] := SSP_P1_USERNAME.Text
-		settings.Save()
-		MsgBox("Data saved successfully!`nRestart to apply")
-	} catch Error as e {
-		MsgBox("Error while saving!")
-	}
+    try {
+        settings.Settings["Name"] := SSP_P1_NAME.Text
+        settings.Settings["Role"] := SSP_P1_ROLE.Text
+        settings.Settings["UserName"] := SSP_P1_USERNAME.Text
+        settings.Save()
+        MsgBox("Data saved successfully!`nRestart to apply")
+    } catch Error as e {
+        MsgBox("Error while saving!")
+    }
 }
 
 class IniConfig {
-	__New(iniPath) {
-		this.path := iniPath
-		this.Settings := IniConfig.Section(iniPath, "Settings")
-		this.UserData := IniConfig.Section(iniPath, "UserData")
-		this.Binds := IniConfig.Section(iniPath, "Binds")
-	}
+    __New(iniPath) {
+        this.path := iniPath
+        this.Settings := IniConfig.Section(iniPath, "Settings")
+        this.UserData := IniConfig.Section(iniPath, "UserData")
+        this.Binds := IniConfig.Section(iniPath, "Binds")
+    }
 
-	class Section {
-		__New(iniPath, sectionName) {
-			this.DefineProp("path", { get: (*) => iniPath })
-			this.DefineProp("name", { get: (*) => sectionName })
-		}
+    class Section {
+        __New(iniPath, sectionName) {
+            this.DefineProp("path", { get: (*) => iniPath })
+            this.DefineProp("name", { get: (*) => sectionName })
+        }
 
-		Get(key, default := "") => IniRead(this.path, this.name, key, default)
-		Set(key, value) => IniWrite(value, this.path, this.name, key)
+        Get(key, default := "") => IniRead(this.path, this.name, key, default)
+        Set(key, value) => IniWrite(value, this.path, this.name, key)
 
-		ReadAll() {
-			section := IniRead(this.path, this.name)
-			result := Map()
-			for k, v in StrSplit(section, "`n")
-				result[StrSplit(v, "=")[1]] := StrSplit(v, "=")[2]
-			return result
-		}
-	}
+        ReadAll() {
+            section := IniRead(this.path, this.name)
+            result := Map()
+            for k, v in StrSplit(section, "`n")
+                result[StrSplit(v, "=")[1]] := StrSplit(v, "=")[2]
+            return result
+        }
+    }
 }
 
 class SettingsManager {
@@ -89,7 +89,7 @@ class SettingsManager {
             "program_version", 2.0,
             "code_version", 1,
             "HotKeyStatus", true,
-            "CurrentPage", "SBT01", 
+            "CurrentPage", "SBT01",
             "Font", "Segoe UI",
             "FontSize", 11,
             "UserName", "User",
@@ -98,7 +98,7 @@ class SettingsManager {
             "Name", "",
             "FocusMethod", 1,
             "BeforeEsc", 1,
-            "BeforeCheck", 0, 
+            "BeforeCheck", 0,
             "BeforeLimit", 0,
             "ShowStatus", 1,
             "UpdateCheck", 1
@@ -115,8 +115,8 @@ class SettingsManager {
     }
 
     LoadUserData() {
-        userDataFields := ["UserName", "Role", "Name", "FocusMethod", "BeforeEsc", 
-                          "BeforeCheck", "BeforeLimit", "ShowStatus", "UpdateCheck"]
+        userDataFields := ["UserName", "Role", "Name", "FocusMethod", "BeforeEsc",
+            "BeforeCheck", "BeforeLimit", "ShowStatus", "UpdateCheck"]
         for field in userDataFields
             try this.Settings[field] := IniRead(this.path, "UserData", field, this.Settings[field])
     }
@@ -131,26 +131,26 @@ class SettingsManager {
         }
     }
 
-	Save() {
-		userDataFields := ["UserName", "Role", "Name", "FocusMethod", "BeforeEsc",
-			"BeforeCheck", "BeforeLimit", "ShowStatus", "UpdateCheck"]
+    Save() {
+        userDataFields := ["UserName", "Role", "Name", "FocusMethod", "BeforeEsc",
+            "BeforeCheck", "BeforeLimit", "ShowStatus", "UpdateCheck"]
 
-		for key, value in this.Settings {
-			section := userDataFields.Has(key) ? "UserData" : "Settings"
-			IniWrite(value, this.path, section, key)
-		}
-	}
+        for key, value in this.Settings {
+            section := userDataFields.Has(key) ? "UserData" : "Settings"
+            IniWrite(value, this.path, section, key)
+        }
+    }
 
-	SaveBind(index, value) {
-		if (index >= 1 && index <= 45) {
-			IniWrite(value, this.path, "Binds", index)
-			this.Binds[index] := value
-		}
-	}
+    SaveBind(index, value) {
+        if (index >= 1 && index <= 45) {
+            IniWrite(value, this.path, "Binds", index)
+            this.Binds[index] := value
+        }
+    }
 }
 
 global FocusMethod := Settings["FocusMethod"]
-global BeforeEsc := Settings["BeforeEsc"]  
+global BeforeEsc := Settings["BeforeEsc"]
 global BeforeCheck := Settings["BeforeCheck"]
 global BeforeLimit := Settings["BeforeLimit"]
 global ShowStatus := Settings["ShowStatus"]
@@ -161,8 +161,8 @@ global Name := Settings["Name"]
 
 config := IniConfig("settings.ini")
 Settings := config.Settings.ReadAll()
-for k,v in config.UserData.ReadAll()
-   Settings[k] := v
+for k, v in config.UserData.ReadAll()
+    Settings[k] := v
 
 global KeyBinds := Map()
 global Settings := Map()
@@ -226,7 +226,7 @@ SetWindowColor(hwnd, titleText?, titleBackground?, border?)
     static DWMWA_TEXT_COLOR := 36
     if (VerCompare(A_OSVersion, "10.0.22200") < 0)
         return
-        DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, border)
+    DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, border)
     if (titleBackground ?? 0)
         DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, titleBackground)
     if (titleText ?? 0)
@@ -941,7 +941,6 @@ mainbindsy := t.y + 35
 ; MainBindUI.Show("w260 h" mainbindsy)
 
 
-
 RareBindUI := GuiExt("", "AHK | Hospital v2 ")
 RareBindUI.SetFont("cWhite s" FontSize - 1, Font)
 RareBindUI.BackColor := 0x171717
@@ -1020,8 +1019,6 @@ SetWindowAttribute(RareBindUI)
 SetWindowColor(RareBindUI.Hwnd, 0xFFFFFFFF, 0x171717, 0xFF202020)
 rarebindy := t.y + 35
 ; RareBindUI.Show("w260 h" rarebindy)
-
-
 
 
 EducBindUI := GuiExt("", "AHK | Hospital v2 ")
@@ -1111,7 +1108,6 @@ SetWindowAttribute(MenuUI)
 SetWindowColor(MenuUI.Hwnd, 0xFFFFFFFF, 0x171717, 0xFF202020)
 mainbindy := menu_stopstart.Y + 35
 ; MenuUI.Show("w260 h" mainbindy)
-
 
 
 PMPBindUI := GuiExt("", "AHK | Hospital v2 ")
