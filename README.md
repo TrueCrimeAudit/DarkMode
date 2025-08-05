@@ -34,3 +34,9 @@ Using `OnMessage(0x004E)` to catch `WM_NOTIFY` messages and intercept `NM_CUSTOM
 The latest version is in `___Darkest.ahk` - run it and you'll see the inconsistent behavior.
 
 If you know WinAPI custom drawing or have dealt with similar issues in AHK, any help would be appreciated.
+
+## Screenshots
+
+![Dark Mode GUI Example 1](screenshot1.png)
+
+![Dark Mode GUI Example 2](screenshot2.png)
